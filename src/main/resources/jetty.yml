@@ -1,0 +1,4 @@
+server:
+  requestLog:
+    print: true
+    filename: ./logs/request.log

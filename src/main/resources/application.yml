@@ -1,0 +1,39 @@
+server:
+    port: 36601
+    connectionTimeout: 60000
+    jetty:
+      acceptors: 1
+      selectors: 10
+
+logging:
+  #file: ""
+  pattern:
+    console: "%highlight(%-5level)[order-management] [%date] [%yellow(%X{txnId})] [%thread] [%cyan(%logger{0})]: %message%n%n"
+
+health:
+  rotationConfig:
+    persistentFilePath: /tmp/tms.log
+
+spring:
+  profiles:
+    active:
+
+spring.output.ansi.enabled: ALWAYS
+
+quartz.enabled: true
+
+appDbType: "mysql"
+partitionConfiguration:
+doPartition: true
+size: "1000000"
+
+logbook:
+    exclude:
+        - /health
+        - /admin/**
+        - /swagger-ui/**
+    filter.enabled: false
+    format.style: http
+    write:
+        category: http.wire-log
+        level: INFO

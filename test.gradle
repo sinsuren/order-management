@@ -1,0 +1,57 @@
+dependencies {
+    testCompile "org.springframework.boot:spring-boot-starter-test:${spring_boot_version}"
+    testCompile "org.springframework.boot:spring-boot-starter-jetty:${spring_boot_version}"
+    testCompile 'com.h2database:h2:1.4.194'
+
+}
+
+// http://www.petrikainulainen.net/programming/gradle/getting-started-with-gradle-integration-testing/
+// and the comments section
+// integration test source-set
+sourceSets {
+    // Note that just declaring this source set creates two configurations.
+    integration {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir file('src/integration/java')
+        }
+
+        resources.srcDir file('src/integration/resources')
+    }
+}
+
+//configurations {
+//    testCompile.exclude group: 'org.glassfish.jersey.ext', module: 'jersey-spring3'
+//}
+configurations {
+    integrationCompile.extendsFrom testCompile
+    integrationRuntime.extendsFrom testRuntime
+}
+
+task integration(type: Test) {
+    description = "Run integration tests (located in src/integration/...)."
+    group = 'verification'
+    testClassesDir = project.sourceSets.integration.output.classesDir
+    classpath = project.sourceSets.integration.runtimeClasspath
+
+    outputs.upToDateWhen { false }
+}
+
+// To generate separate html reports for unit and integration tests
+tasks.withType(Test) {
+    systemProperty 'spring.profiles.active', System.getProperty('spring.profiles.active', 'dev')
+    reports.html.destination = file("${buildDir}/${name}")
+}
+
+test {
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+    }
+}
+
+integration {
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+    }
+}
